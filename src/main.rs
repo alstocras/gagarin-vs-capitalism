@@ -276,8 +276,8 @@ async fn main() {
                     draw_circle(bullet.x, bullet.y, bullet.size, PURPLE);
                 }
                 // player
-                draw_circle(player.x, player.y, 16.0, RED);
                 exhaustEmitter.draw(vec2(player.x, player.y));
+                draw_circle(player.x, player.y, 16.0, RED);
 
                 // effects
                 for (explosion, coords) in &mut explosions {
