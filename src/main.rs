@@ -1,4 +1,6 @@
 use macroquad::prelude::*;
+use macroquad_particles as particles;
+use macroquad_particles::*;
 use std::fs::*;
 
 struct GameObject {
@@ -25,6 +27,27 @@ impl GameObject {
     }
 }
 
+fn particleExplosion() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        local_coords: false,
+        one_shot: true,
+        emitting: true,
+        lifetime: 1.0,
+        lifetime_randomness: 0.5,
+        initial_direction_spread: 2.0 * std::f32::consts::PI,
+        initial_velocity: 300.0,
+        initial_velocity_randomness: 200.0,
+        size: 3.0,
+        size_randomness: 1.0,
+        colors_curve: ColorCurve {
+            start: BLUE,
+            mid: WHITE,
+            end: RED,
+        },
+        ..Default::default()
+    }
+}
+
 enum GameState {
     Menu,
     Game,
@@ -36,8 +59,11 @@ enum GameState {
 async fn main() {
     let jbmGameFont = load_ttf_font("assets/fonts/jbm.ttf").await.unwrap();
     set_default_font(jbmGameFont);
+
     let mut enemies = vec![];
     let mut bullets: Vec<GameObject> = vec![];
+    let mut explosions: Vec<(Emitter, Vec2)> = vec![];
+
     let mut shotTime: f64 = get_time();
     let mut score: u32 = 0;
     // filereading stuff, basically reads the file and converts to u32
@@ -75,6 +101,7 @@ async fn main() {
                     bullets.clear();
                     player.x = screen_width() / 2.0;
                     player.y = screen_height() / 2.0;
+                    explosions.clear();
                     gameState = GameState::Game;
                 }
                 let helperText = "press space to play, esc to quit";
@@ -184,12 +211,23 @@ async fn main() {
                 enemies.retain(|enemy| !enemy.hitByBullet);
                 bullets.retain(|bullet| !bullet.hitByBullet);
 
+                // delete when done
+                explosions.retain(|(explosion, _)| explosion.config.emitting);
+
                 // collisions
                 for bullet in &mut bullets {
                     for enemy in &mut enemies {
                         if bullet.checkCollision(enemy) {
                             bullet.hitByBullet = true;
                             enemy.hitByBullet = true;
+                            // bigger and faster = more explosion
+                            explosions.push((
+                                Emitter::new(EmitterConfig {
+                                    amount: (enemy.size.round() + enemy.speed.round()) as u32 * 2,
+                                    ..particleExplosion()
+                                }),
+                                vec2(enemy.x, enemy.y),
+                            ));
                             score += (enemy.size.round() + enemy.speed.round()) as u32;
                             highScore = highScore.max(score);
                         }
@@ -213,6 +251,11 @@ async fn main() {
                     draw_circle(bullet.x, bullet.y, bullet.size, PURPLE);
                 }
                 draw_circle(player.x, player.y, 16.0, RED); // player
+
+                // effects
+                for (explosion, coords) in &mut explosions {
+                    explosion.draw(*coords);
+                }
 
                 // render scores
                 draw_text(format!("score: {}", score).as_str(), 10.0, 35.0, 25.0, RED);
