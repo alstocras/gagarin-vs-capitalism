@@ -82,7 +82,8 @@ enum GameState {
 
 #[macroquad::main("yuri gagarin vs capitalism")]
 async fn main() {
-    let jbmGameFont = load_ttf_font("assets/fonts/jbm.ttf").await.unwrap();
+    let fontBytes = include_bytes!("../assets/fonts/jbm.ttf");
+    let jbmGameFont = load_ttf_font_from_bytes(fontBytes).unwrap();
     set_pc_assets_folder("assets");
     set_default_font(jbmGameFont);
 
