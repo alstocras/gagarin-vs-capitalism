@@ -4,21 +4,23 @@ use macroquad::prelude::*;
 async fn main() {
     let mut playerX: f32 = screen_width() / 2.0;
     let mut playerY: f32 = screen_height() / 2.0;
+    let speed: f32 = 2.0;
+
     loop {
         clear_background(BLACK);
 
         // input
         if is_key_down(KeyCode::Y) || is_key_down(KeyCode::W) {
-            playerY -= 1.0;
+            playerY -= speed;
         }
         if is_key_down(KeyCode::I) || is_key_down(KeyCode::S) {
-            playerY += 1.0;
+            playerY += speed;
         }
         if is_key_down(KeyCode::C) || is_key_down(KeyCode::A) {
-            playerX -= 1.0;
+            playerX -= speed;
         }
         if is_key_down(KeyCode::E) || is_key_down(KeyCode::D) {
-            playerX += 1.0;
+            playerX += speed;
         }
 
         // rendering
