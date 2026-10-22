@@ -23,6 +23,8 @@ jobs:
           override: true
 
       - name: Build
+        env:
+          RUSTFLAGS: "-C link-arg=--allow-undefined"
         run: cargo build --release --target wasm32-unknown-unknown
 
       - name: Prepare Deployment Directory
