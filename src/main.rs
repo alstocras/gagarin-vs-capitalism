@@ -179,7 +179,7 @@ async fn main() {
                         if bullet.checkCollision(enemy) {
                             bullet.hitByBullet = true;
                             enemy.hitByBullet = true;
-                            score += enemy.size.round() as u32;
+                            score += (enemy.size.round() + enemy.speed.round()) as u32;
                             highScore = highScore.max(score);
                         }
                     }
