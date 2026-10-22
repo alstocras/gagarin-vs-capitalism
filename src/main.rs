@@ -48,6 +48,29 @@ fn particleExplosion() -> particles::EmitterConfig {
     }
 }
 
+fn returnExhaust() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        local_coords: false,
+        one_shot: false,
+        lifetime: 2.0,
+        explosiveness: 0.5,
+        lifetime_randomness: 0.4,
+        amount: 200,
+        initial_direction: vec2(0.0, 1.0),
+        initial_direction_spread: 0.5,
+        gravity: vec2(0.0, 50.0),
+        initial_velocity: 100.0,
+        initial_velocity_randomness: 0.5,
+        size: 2.0,
+        colors_curve: ColorCurve {
+            start: WHITE,
+            mid: ORANGE,
+            end: RED,
+        },
+        ..Default::default()
+    }
+}
+
 enum GameState {
     Menu,
     Game,
@@ -59,6 +82,8 @@ enum GameState {
 async fn main() {
     let jbmGameFont = load_ttf_font("assets/fonts/jbm.ttf").await.unwrap();
     set_default_font(jbmGameFont);
+
+    let mut exhaustEmitter = Emitter::new(returnExhaust());
 
     let mut enemies = vec![];
     let mut bullets: Vec<GameObject> = vec![];
@@ -250,7 +275,9 @@ async fn main() {
                 for bullet in &bullets {
                     draw_circle(bullet.x, bullet.y, bullet.size, PURPLE);
                 }
-                draw_circle(player.x, player.y, 16.0, RED); // player
+                // player
+                draw_circle(player.x, player.y, 16.0, RED);
+                exhaustEmitter.draw(vec2(player.x, player.y));
 
                 // effects
                 for (explosion, coords) in &mut explosions {
