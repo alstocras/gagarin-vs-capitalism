@@ -139,14 +139,6 @@ async fn main() {
     let explosion = load_sound("sound/explosion.wav").await.unwrap();
     let shootSound = load_sound("sound/shoot.wav").await.unwrap();
 
-    play_sound(
-        &bgm,
-        PlaySoundParams {
-            looped: true,
-            volume: 0.9,
-        },
-    );
-
     loop {
         match gameState {
             GameState::Menu => {
@@ -163,6 +155,13 @@ async fn main() {
                     player.y = screen_height() / 2.0;
                     explosions.clear();
                     gameState = GameState::Game;
+                    play_sound(
+                        &bgm,
+                        PlaySoundParams {
+                            looped: true,
+                            volume: 0.9,
+                        },
+                    );
                 }
                 let helperText = "press space to play, esc to quit";
                 let helperTextDimen = measure_text(helperText, None, 35, 1.0);
