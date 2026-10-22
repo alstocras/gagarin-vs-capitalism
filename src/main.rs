@@ -46,11 +46,11 @@ async fn main() {
 
         // add enemies
         if rand::gen_range(0, 99) >= 95 {
-            let size = rand::gen_range(8.0, 128.0);
+            let size = rand::gen_range(16.0, 64.0);
             enemies.push(GameObject {
                 size,
-                speed: rand::gen_range(12.0, 200.0),
-                x: screen_width() / 2.0,
+                speed: rand::gen_range(20.0, 200.0),
+                x: rand::gen_range(0.0, screen_width()),
                 y: -size,
             });
         }
