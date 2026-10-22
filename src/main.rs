@@ -91,6 +91,11 @@ async fn main() {
     playerSprite.set_filter(FilterMode::Nearest);
     let mut playerRotation: f32 = 0.0;
 
+    let enemySprite: Texture2D = load_texture("sprites/spacex.png")
+        .await
+        .expect("failed to load");
+    enemySprite.set_filter(FilterMode::Nearest);
+
     build_textures_atlas();
 
     let mut exhaustEmitter = Emitter::new(returnExhaust());
@@ -280,12 +285,16 @@ async fn main() {
 
                 // enemies
                 for enemy in &enemies {
-                    draw_rectangle(
-                        enemy.x - enemy.width / 2.0,
-                        enemy.y - enemy.height / 2.0,
-                        enemy.width,
-                        enemy.height,
+                    draw_texture_ex(
+                        &enemySprite,
+                        enemy.x - enemySprite.width() / 2.0,
+                        enemy.y - enemySprite.height() / 2.0,
                         enemy.colour,
+                        DrawTextureParams {
+                            rotation: 0.0,
+                            pivot: None,
+                            ..Default::default()
+                        },
                     );
                 }
                 // bullets
