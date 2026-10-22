@@ -4,7 +4,8 @@ use macroquad_particles::*;
 use std::fs::*;
 
 struct GameObject {
-    size: f32,
+    height: f32,
+    width: f32,
     speed: f32,
     x: f32,
     y: f32,
@@ -19,10 +20,10 @@ impl GameObject {
 
     fn makeRect(&self) -> Rect {
         Rect {
-            x: self.x - self.size / 2.0,
-            y: self.y - self.size / 2.0,
-            w: self.size,
-            h: self.size,
+            x: self.x - self.width / 2.0,
+            y: self.y - self.height / 2.0,
+            w: self.width,
+            h: self.height,
         }
     }
 }
@@ -88,6 +89,7 @@ async fn main() {
         .await
         .expect("failed to load");
     playerSprite.set_filter(FilterMode::Nearest);
+    let mut playerRotation: f32 = 0.0;
 
     build_textures_atlas();
 
@@ -105,7 +107,8 @@ async fn main() {
         .unwrap_or(0);
 
     let mut player = GameObject {
-        size: 32.0,
+        height: playerSprite.height(),
+        width: playerSprite.width(),
         speed: 200.0,
         x: screen_width() / 2.0,
         y: screen_height() / 2.0,
@@ -166,15 +169,19 @@ async fn main() {
                 // input
                 if is_key_down(KeyCode::Y) || is_key_down(KeyCode::W) {
                     player.y -= player.speed * dt;
+                    playerRotation = 0.0;
                 }
                 if is_key_down(KeyCode::I) || is_key_down(KeyCode::S) {
                     player.y += player.speed * dt;
+                    playerRotation = std::f32::consts::PI;
                 }
                 if is_key_down(KeyCode::C) || is_key_down(KeyCode::A) {
                     player.x -= player.speed * dt;
+                    playerRotation = -std::f32::consts::PI / 2.0;
                 }
                 if is_key_down(KeyCode::E) || is_key_down(KeyCode::D) {
                     player.x += player.speed * dt;
+                    playerRotation = std::f32::consts::PI / 2.0;
                 }
 
                 // shooting
@@ -184,7 +191,8 @@ async fn main() {
                             x: player.x,
                             y: player.y,
                             speed: player.speed * 2.0,
-                            size: 5.0,
+                            width: 5.0,
+                            height: 5.0,
                             colour: PURPLE,
                             hitByBullet: false,
                         });
@@ -207,7 +215,8 @@ async fn main() {
                     let colourIndex = rand::gen_range(0, 5) as usize;
                     let genColour = enemyColours[colourIndex];
                     enemies.push(GameObject {
-                        size,
+                        width: size,
+                        height: size,
                         speed: rand::gen_range(20.0, 200.0),
                         x: rand::gen_range(0.0, screen_width()),
                         y: -size,
@@ -237,8 +246,8 @@ async fn main() {
                 }
 
                 // delete if offscreen
-                enemies.retain(|enemy| enemy.y < screen_height() + enemy.size / 2.0);
-                bullets.retain(|bullet| bullet.y > 0.0 - bullet.size / 2.0);
+                enemies.retain(|enemy| enemy.y < screen_height() + enemy.height / 2.0);
+                bullets.retain(|bullet| bullet.y > 0.0 - bullet.height / 2.0);
 
                 // delete if shot
                 enemies.retain(|enemy| !enemy.hitByBullet);
@@ -256,12 +265,12 @@ async fn main() {
                             // bigger and faster = more explosion
                             explosions.push((
                                 Emitter::new(EmitterConfig {
-                                    amount: (enemy.size.round() + enemy.speed.round()) as u32 * 2,
+                                    amount: (enemy.height.round() + enemy.speed.round()) as u32 * 2,
                                     ..particleExplosion()
                                 }),
                                 vec2(enemy.x, enemy.y),
                             ));
-                            score += (enemy.size.round() + enemy.speed.round()) as u32;
+                            score += (enemy.height.round() + enemy.speed.round()) as u32;
                             highScore = highScore.max(score);
                         }
                     }
@@ -272,20 +281,30 @@ async fn main() {
                 // enemies
                 for enemy in &enemies {
                     draw_rectangle(
-                        enemy.x - enemy.size / 2.0,
-                        enemy.y - enemy.size / 2.0,
-                        enemy.size,
-                        enemy.size,
+                        enemy.x - enemy.width / 2.0,
+                        enemy.y - enemy.height / 2.0,
+                        enemy.width,
+                        enemy.height,
                         enemy.colour,
                     );
                 }
                 // bullets
                 for bullet in &bullets {
-                    draw_circle(bullet.x, bullet.y, bullet.size, PURPLE);
+                    draw_circle(bullet.x, bullet.y, bullet.height, PURPLE);
                 }
                 // player
                 exhaustEmitter.draw(vec2(player.x, player.y));
-                draw_texture(&playerSprite, player.x, player.y, WHITE);
+                draw_texture_ex(
+                    &playerSprite,
+                    player.x - playerSprite.width() / 2.0,
+                    player.y - playerSprite.height() / 2.0,
+                    WHITE,
+                    DrawTextureParams {
+                        rotation: playerRotation,
+                        pivot: None,
+                        ..Default::default()
+                    },
+                );
 
                 // effects
                 for (explosion, coords) in &mut explosions {
