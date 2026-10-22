@@ -81,7 +81,15 @@ enum GameState {
 #[macroquad::main("yuri gagarin vs capitalism")]
 async fn main() {
     let jbmGameFont = load_ttf_font("assets/fonts/jbm.ttf").await.unwrap();
+    set_pc_assets_folder("assets");
     set_default_font(jbmGameFont);
+
+    let playerSprite: Texture2D = load_texture("sprites/vostok.png")
+        .await
+        .expect("failed to load");
+    playerSprite.set_filter(FilterMode::Nearest);
+
+    build_textures_atlas();
 
     let mut exhaustEmitter = Emitter::new(returnExhaust());
 
@@ -277,7 +285,7 @@ async fn main() {
                 }
                 // player
                 exhaustEmitter.draw(vec2(player.x, player.y));
-                draw_circle(player.x, player.y, 16.0, RED);
+                draw_texture(&playerSprite, player.x, player.y, WHITE);
 
                 // effects
                 for (explosion, coords) in &mut explosions {
