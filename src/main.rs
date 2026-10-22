@@ -180,13 +180,22 @@ async fn main() {
         }
 
         if isGameOver {
-            let message = "capitalism has defeated you, товарищ. space to try again.";
+            let message = "capitalism has defeated you. space to try again.";
             let textDimensions = measure_text(message, None, 30, 1.0);
             draw_text(
                 message,
                 screen_width() / 2.0 - textDimensions.width / 2.0,
                 screen_height() / 2.0 + textDimensions.height / 2.0,
                 30.0,
+                RED,
+            );
+            let scoreInfo = format!("high score: {}", highScore);
+            let scoreMeasure = measure_text(scoreInfo.as_str(), None, 25, 1.0);
+            draw_text(
+                scoreInfo.as_str(),
+                screen_width() / 2.0 - scoreMeasure.width / 2.0,
+                screen_height() / 2.0 + 2.0 * scoreMeasure.height,
+                25.0,
                 RED,
             );
         }
