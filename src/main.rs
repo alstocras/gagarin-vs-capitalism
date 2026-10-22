@@ -137,6 +137,7 @@ async fn main() {
     // music & sfx
     let bgm = load_sound("sound/music.ogg").await.unwrap();
     let explosion = load_sound("sound/explosion.wav").await.unwrap();
+    let shootSound = load_sound("sound/shoot.wav").await.unwrap();
 
     play_sound(
         &bgm,
@@ -222,6 +223,7 @@ async fn main() {
                             colour: PURPLE,
                             hitByBullet: false,
                         });
+                        play_sound_once(&shootSound);
                         shotTime = get_time();
                     }
                 }
