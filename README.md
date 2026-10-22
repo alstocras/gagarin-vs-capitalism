@@ -6,6 +6,8 @@ random game to practise macroquad
 
 - spaceship sprite from [subject9x --- opengameart](https://opengameart.org/content/spaceship-sprites-ussr-nasa), ccbysa 4
 
+- shooting sound effect from [michael klier --- opengameart](https://opengameart.org/content/futuristic-shotgun)
+
 - background music: thanks us navy band & alexander alexandrov
 
 ## THIS IS NOT SCIENTIFICALLY ACCURATE!!!!

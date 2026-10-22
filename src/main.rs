@@ -136,12 +136,13 @@ async fn main() {
 
     // music & sfx
     let bgm = load_sound("sound/music.ogg").await.unwrap();
+    let explosion = load_sound("sound/explosion.wav").await.unwrap();
 
     play_sound(
         &bgm,
         PlaySoundParams {
             looped: true,
-            volume: 0.75,
+            volume: 0.9,
         },
     );
 
@@ -287,6 +288,8 @@ async fn main() {
                         if bullet.checkCollision(enemy) {
                             bullet.hitByBullet = true;
                             enemy.hitByBullet = true;
+                            score += (enemy.height.round() + enemy.speed.round()) as u32;
+                            highScore = highScore.max(score);
                             // bigger and faster = more explosion
                             explosions.push((
                                 Emitter::new(EmitterConfig {
@@ -295,8 +298,7 @@ async fn main() {
                                 }),
                                 vec2(enemy.x, enemy.y),
                             ));
-                            score += (enemy.height.round() + enemy.speed.round()) as u32;
-                            highScore = highScore.max(score);
+                            play_sound_once(&explosion);
                         }
                     }
                 }
