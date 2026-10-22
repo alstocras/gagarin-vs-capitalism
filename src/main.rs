@@ -220,8 +220,8 @@ async fn main() {
                     let colourIndex = rand::gen_range(0, 5) as usize;
                     let genColour = enemyColours[colourIndex];
                     enemies.push(GameObject {
-                        width: size,
-                        height: size,
+                        width: enemySprite.width(),
+                        height: enemySprite.height(),
                         speed: rand::gen_range(20.0, 200.0),
                         x: rand::gen_range(0.0, screen_width()),
                         y: -size,
