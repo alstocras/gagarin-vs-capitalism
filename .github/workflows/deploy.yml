@@ -27,7 +27,7 @@ jobs:
 
       - name: Prepare Deployment Directory
         run: |
-          mkdir -p ./deploy
+          mkdir -p ./deploy/assets
           cp ./target/wasm32-unknown-unknown/release/gdc.wasm ./deploy/
           cp index.html ./deploy/
           cp -r assets ./deploy/
