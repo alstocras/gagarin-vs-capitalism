@@ -1,3 +1,4 @@
+use macroquad::audio::*;
 use macroquad::prelude::*;
 use macroquad_particles as particles;
 use macroquad_particles::*;
@@ -132,6 +133,17 @@ async fn main() {
 
     // seed random generator
     rand::srand(miniquad::date::now() as u64);
+
+    // music & sfx
+    let bgm = load_sound("sound/music.ogg").await.unwrap();
+
+    play_sound(
+        &bgm,
+        PlaySoundParams {
+            looped: true,
+            volume: 0.75,
+        },
+    );
 
     loop {
         match gameState {
