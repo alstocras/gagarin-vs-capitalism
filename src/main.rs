@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use std::fs::*;
 
 struct GameObject {
     size: f32,
@@ -31,6 +32,7 @@ async fn main() {
     let mut enemies = vec![];
     let mut bullets: Vec<GameObject> = vec![];
     let mut shotTime: f64 = get_time();
+    let mut score: u32 = 0;
 
     let mut player = GameObject {
         size: 32.0,
@@ -80,6 +82,8 @@ async fn main() {
                         hitByBullet: false,
                     });
                     shotTime = get_time();
+                } else {
+                    continue;
                 }
             }
 
@@ -157,7 +161,7 @@ async fn main() {
         }
 
         if isGameOver {
-            let message = "capitalism has defeated you. space to try again.";
+            let message = "capitalism has defeated you, товарищ. space to try again.";
             let textDimensions = measure_text(message, None, 30, 1.0);
             draw_text(
                 message,
