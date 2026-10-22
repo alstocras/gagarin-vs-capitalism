@@ -30,6 +30,7 @@ async fn main() {
     set_default_font(jbmGameFont);
     let mut enemies = vec![];
     let mut bullets: Vec<GameObject> = vec![];
+    let mut shotTime: f64 = get_time();
 
     let mut player = GameObject {
         size: 32.0,
@@ -69,15 +70,17 @@ async fn main() {
 
             // shooting
             if is_key_down(KeyCode::Space) {
-                bullets.push(GameObject {
-                    x: player.x,
-                    y: player.y,
-                    speed: player.speed * 2.0,
-                    size: 5.0,
-                    colour: PURPLE,
-                    hitByBullet: false,
-                });
-                println!("shot");
+                if (get_time() - shotTime) > 0.25 {
+                    bullets.push(GameObject {
+                        x: player.x,
+                        y: player.y,
+                        speed: player.speed * 2.0,
+                        size: 5.0,
+                        colour: PURPLE,
+                        hitByBullet: false,
+                    });
+                    shotTime = get_time();
+                }
             }
 
             // stop you from going out of bounds
