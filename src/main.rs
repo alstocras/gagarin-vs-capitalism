@@ -26,6 +26,7 @@ impl GameObject {
 #[macroquad::main("yuri gagarin vs capitalism")]
 async fn main() {
     let jbmGameFont = load_ttf_font("assets/fonts/jbm.ttf").await.unwrap();
+    set_default_font(jbmGameFont);
     let mut enemies = vec![];
 
     let mut player = GameObject {
@@ -107,18 +108,13 @@ async fn main() {
 
         if isGameOver {
             let message = "capitalism has defeated you. space to try again.";
-            let textDimensions = measure_text(message, Some(&jbmGameFont), 30, 1.0);
-            draw_text_ex(
+            let textDimensions = measure_text(message, None, 30, 1.0);
+            draw_text(
                 message,
                 screen_width() / 2.0 - textDimensions.width / 2.0,
-                screen_height() / 2.0,
-                TextParams {
-                    font: Some(&jbmGameFont),
-                    font_size: 30,
-                    font_scale: 1.0,
-                    color: RED,
-                    ..Default::default()
-                },
+                screen_height() / 2.0 + textDimensions.height / 2.0,
+                30.0,
+                RED,
             );
         }
 
