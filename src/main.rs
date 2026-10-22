@@ -8,6 +8,21 @@ struct GameObject {
     colour: Color,
 }
 
+impl GameObject {
+    fn checkCollision(&self, other: &Self) -> bool {
+        self.makeRect().overlaps(&other.makeRect())
+    }
+
+    fn makeRect(&self) -> Rect {
+        Rect {
+            x: self.x,
+            y: self.y,
+            w: self.size,
+            h: self.size,
+        }
+    }
+}
+
 #[macroquad::main("yuri gagarin vs capitalism")]
 async fn main() {
     let mut enemies = vec![];
@@ -60,6 +75,13 @@ async fn main() {
                 y: -size,
                 colour: genColour,
             });
+        }
+
+        // collisions
+        for e in &enemies {
+            if player.checkCollision(e) {
+                println!("collide!!");
+            };
         }
 
         // move & draw enemies
