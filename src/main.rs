@@ -33,6 +33,9 @@ async fn main() {
     let mut bullets: Vec<GameObject> = vec![];
     let mut shotTime: f64 = get_time();
     let mut score: u32 = 0;
+    let mut highScore: u32 = read_to_string("highscore.dat")
+        .map_or(Ok(0), |i| i.parse::<u32>())
+        .unwrap_or(0);
 
     let mut player = GameObject {
         size: 32.0,
@@ -82,8 +85,6 @@ async fn main() {
                         hitByBullet: false,
                     });
                     shotTime = get_time();
-                } else {
-                    continue;
                 }
             }
 
@@ -110,6 +111,9 @@ async fn main() {
             for e in &enemies {
                 if player.checkCollision(e) {
                     println!("collide!!");
+                    if score >= highScore {
+                        write("highscore.dat", highScore.to_string()).ok();
+                    }
                     isGameOver = true;
                 };
             }
@@ -137,6 +141,8 @@ async fn main() {
                     if bullet.checkCollision(enemy) {
                         bullet.hitByBullet = true;
                         enemy.hitByBullet = true;
+                        score += enemy.size.round() as u32;
+                        highScore = highScore.max(score);
                     }
                 }
             }
@@ -157,7 +163,20 @@ async fn main() {
             for bullet in &bullets {
                 draw_circle(bullet.x, bullet.y, bullet.size, PURPLE);
             }
-            draw_circle(player.x, player.y, 16.0, RED); // player\
+            draw_circle(player.x, player.y, 16.0, RED); // player
+
+            // render scores
+            draw_text(format!("score: {}", score).as_str(), 10.0, 35.0, 25.0, RED);
+
+            let highScoreText = format!("high score: {}", highScore);
+            let highScoreDimensions = measure_text(highScoreText.as_str(), None, 25, 1.0);
+            draw_text(
+                highScoreText.as_str(),
+                screen_width() - highScoreDimensions.width,
+                35.0,
+                25.0,
+                RED,
+            );
         }
 
         if isGameOver {
@@ -173,6 +192,7 @@ async fn main() {
         }
 
         if isGameOver && is_key_pressed(KeyCode::Space) {
+            score = 0;
             enemies.clear();
             bullets.clear();
             player.x = screen_width() / 2.0;
