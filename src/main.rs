@@ -91,10 +91,15 @@ async fn main() {
     playerSprite.set_filter(FilterMode::Nearest);
     let mut playerRotation: f32 = 0.0;
 
-    let enemySprite: Texture2D = load_texture("sprites/spacex.png")
+    let enemySprite: Texture2D = load_texture("sprites/enemy.png")
         .await
         .expect("failed to load");
     enemySprite.set_filter(FilterMode::Nearest);
+
+    let bulletSprite: Texture2D = load_texture("sprites/bullet.png")
+        .await
+        .expect("failed to load");
+    bulletSprite.set_filter(FilterMode::Nearest);
 
     build_textures_atlas();
 
@@ -187,6 +192,9 @@ async fn main() {
                 if is_key_down(KeyCode::E) || is_key_down(KeyCode::D) {
                     player.x += player.speed * dt;
                     playerRotation = std::f32::consts::PI / 2.0;
+                }
+                if !is_any_key_down() {
+                    playerRotation = 0.0;
                 }
 
                 // shooting
@@ -300,6 +308,12 @@ async fn main() {
                 // bullets
                 for bullet in &bullets {
                     draw_circle(bullet.x, bullet.y, bullet.height, PURPLE);
+                    draw_texture(
+                        &bulletSprite,
+                        bullet.x - bulletSprite.width() / 2.0,
+                        bullet.y - bulletSprite.height() / 2.0,
+                        WHITE,
+                    )
                 }
                 // player
                 exhaustEmitter.draw(vec2(player.x, player.y));
