@@ -82,8 +82,19 @@ async fn main() {
                 draw_text(
                     helperText,
                     screen_width() / 2.0 - helperTextDimen.width / 2.0,
-                    screen_height() / 2.0,
+                    screen_height() / 2.0 + helperTextDimen.height / 2.0,
                     35.0,
+                    WHITE,
+                );
+
+                // TITLE
+                let title = "gagarin vs capitalism";
+                let titleDimen = measure_text(title, None, 70, 1.0);
+                draw_text(
+                    title,
+                    screen_width() / 2.0 - titleDimen.width / 2.0,
+                    screen_height() / 2.0 - helperTextDimen.height - 25.0,
+                    70.0,
                     RED,
                 );
             }
@@ -231,7 +242,7 @@ async fn main() {
                 }
             }
             GameState::Defeat => {
-                let message = "capitalism has defeated you. space to try again.";
+                let message = "capitalism has defeated you. space to return to the menu.";
                 let textDimensions = measure_text(message, None, 30, 1.0);
                 draw_text(
                     message,
@@ -255,7 +266,7 @@ async fn main() {
                     bullets.clear();
                     player.x = screen_width() / 2.0;
                     player.y = screen_height() / 2.0;
-                    gameState = GameState::Game;
+                    gameState = GameState::Menu;
                 }
             }
         }
