@@ -23,22 +23,6 @@
     <canvas id="glcanvas" tabindex='1'></canvas>
     <!-- Minified and statically hosted version of https://github.com/not-fl3/macroquad/blob/master/js/mq_js_bundle.js -->
     <script src="mq_js_bundle.js"></script>
-        <script>
-        // Manually fetch and instantiate if the wrapper hides 'load'
-        window.addEventListener('load', function () {
-            if (typeof load === 'function') {
-                load("gdc.wasm");
-            } else {
-                // Fallback direct execution mirroring Macroquad's expectations
-                console.log("Initializing WASM target...");
-                WebAssembly.instantiateStreaming(fetch("gdc.wasm"), importObject)
-                    .then(result => {
-                        wasm_memory = result.instance.exports.memory;
-                        wasm_exports = result.instance.exports;
-                        result.instance.exports.main();
-                    });
-            }
-        });
-    </script>
+    <script>load("gdc.wasm");</script> <!-- Your compiled WASM binary -->
 </body>
 </html>
