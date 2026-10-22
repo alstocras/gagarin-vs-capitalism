@@ -6,6 +6,7 @@ struct GameObject {
     x: f32,
     y: f32,
     colour: Color,
+    hitByBullet: bool,
 }
 
 impl GameObject {
@@ -28,6 +29,7 @@ async fn main() {
     let jbmGameFont = load_ttf_font("assets/fonts/jbm.ttf").await.unwrap();
     set_default_font(jbmGameFont);
     let mut enemies = vec![];
+    let mut bullets: Vec<GameObject> = vec![];
 
     let mut player = GameObject {
         size: 32.0,
@@ -35,6 +37,7 @@ async fn main() {
         x: screen_width() / 2.0,
         y: screen_height() / 2.0,
         colour: RED,
+        hitByBullet: false,
     };
 
     let mut isGameOver: bool = false;
@@ -64,6 +67,19 @@ async fn main() {
                 player.x += player.speed * dt;
             }
 
+            // shooting
+            if is_key_down(KeyCode::Space) {
+                bullets.push(GameObject {
+                    x: player.x,
+                    y: player.y,
+                    speed: player.speed * 2.0,
+                    size: 5.0,
+                    colour: PURPLE,
+                    hitByBullet: false,
+                });
+                println!("shot");
+            }
+
             // stop you from going out of bounds
             player.x = clamp(player.x, 0.0, screen_width());
             player.y = clamp(player.y, 0.0, screen_height());
@@ -79,6 +95,7 @@ async fn main() {
                     x: rand::gen_range(0.0, screen_width()),
                     y: -size,
                     colour: genColour,
+                    hitByBullet: false,
                 });
             }
 
@@ -90,20 +107,50 @@ async fn main() {
                 };
             }
 
-            // move & draw enemies
+            // move enemies
             for enemy in &mut enemies {
                 enemy.y += enemy.speed * dt;
             }
+            // move bullets
+            for bullet in &mut bullets {
+                bullet.y -= bullet.speed * dt;
+            }
 
             // delete if offscreen
-            enemies.retain(|enemy| enemy.y < screen_height() + enemy.size);
+            enemies.retain(|enemy| enemy.y < screen_height() + enemy.size / 2.0);
+            bullets.retain(|bullet| bullet.y > 0.0 - bullet.size / 2.0);
+
+            // delete if shot
+            enemies.retain(|enemy| !enemy.hitByBullet);
+            bullets.retain(|bullet| !bullet.hitByBullet);
+
+            // collisions
+            for bullet in &mut bullets {
+                for enemy in &mut enemies {
+                    if bullet.checkCollision(enemy) {
+                        bullet.hitByBullet = true;
+                        enemy.hitByBullet = true;
+                    }
+                }
+            }
 
             // rendering
+
+            // enemies
             for enemy in &enemies {
-                // enemies
-                draw_rectangle(enemy.x, enemy.y, enemy.size, enemy.size, enemy.colour);
+                draw_rectangle(
+                    enemy.x - enemy.size / 2.0,
+                    enemy.y - enemy.size / 2.0,
+                    enemy.size,
+                    enemy.size,
+                    enemy.colour,
+                );
             }
-            draw_circle(player.x, player.y, 16.0, RED); // player
+            // bullets
+            for bullet in &bullets {
+                draw_circle(bullet.x, bullet.y, bullet.size, PURPLE);
+            }
+            draw_circle(player.x, player.y, 16.0, RED); // player\
         }
 
         if isGameOver {
@@ -120,6 +167,7 @@ async fn main() {
 
         if isGameOver && is_key_pressed(KeyCode::Space) {
             enemies.clear();
+            bullets.clear();
             player.x = screen_width() / 2.0;
             player.y = screen_height() / 2.0;
             isGameOver = false;
