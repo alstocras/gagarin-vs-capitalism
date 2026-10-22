@@ -71,11 +71,11 @@ async fn main() {
         enemies.retain(|enemy| enemy.y < screen_height() + enemy.size);
 
         // rendering
-        draw_circle(player.x, player.y, 16.0, RED); // player
         for enemy in &enemies {
             // enemies
             draw_rectangle(enemy.x, enemy.y, enemy.size, enemy.size, enemy.colour);
         }
+        draw_circle(player.x, player.y, 16.0, RED); // player
 
         next_frame().await;
     }
