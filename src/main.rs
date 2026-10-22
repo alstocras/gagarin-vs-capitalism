@@ -5,6 +5,7 @@ struct GameObject {
     speed: f32,
     x: f32,
     y: f32,
+    colour: Color,
 }
 
 #[macroquad::main("yuri gagarin vs capitalism")]
@@ -16,7 +17,10 @@ async fn main() {
         speed: 200.0,
         x: screen_width() / 2.0,
         y: screen_height() / 2.0,
+        colour: RED,
     };
+
+    let enemyColours = [BLUE, GREEN, YELLOW, ORANGE, WHITE];
 
     // seed random generator
     rand::srand(miniquad::date::now() as u64);
@@ -47,11 +51,14 @@ async fn main() {
         // add enemies
         if rand::gen_range(0, 99) >= 95 {
             let size = rand::gen_range(16.0, 64.0);
+            let colourIndex = rand::gen_range(0, 5) as usize;
+            let genColour = enemyColours[colourIndex];
             enemies.push(GameObject {
                 size,
                 speed: rand::gen_range(20.0, 200.0),
                 x: rand::gen_range(0.0, screen_width()),
                 y: -size,
+                colour: genColour,
             });
         }
 
@@ -67,7 +74,7 @@ async fn main() {
         draw_circle(player.x, player.y, 16.0, RED); // player
         for enemy in &enemies {
             // enemies
-            draw_rectangle(enemy.x, enemy.y, enemy.size, enemy.size, BLUE);
+            draw_rectangle(enemy.x, enemy.y, enemy.size, enemy.size, enemy.colour);
         }
 
         next_frame().await;
